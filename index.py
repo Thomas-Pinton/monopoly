@@ -24,6 +24,19 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
+# Images
+DICE_FACES = [
+    pygame.image.load('assets/dice-six-faces-one.png'),
+    pygame.image.load('assets/dice-six-faces-two.png'),
+    pygame.image.load('assets/dice-six-faces-three.png'),
+    pygame.image.load('assets/dice-six-faces-four.png'),
+    pygame.image.load('assets/dice-six-faces-five.png'),
+    pygame.image.load('assets/dice-six-faces-six.png'),
+]
+
+for i in range(len(DICE_FACES)):
+    DICE_FACES[i] = pygame.transform.scale(DICE_FACES[i], (50, 50))
+
 # Create the Pygame window
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -65,7 +78,7 @@ class Player:
         else:
             self.color = (0, 0, 255)
             self.buyColor = (0, 0 , 150)
-        self.textX = 0 if id == 1 else WIDTH // 2
+        self.textY = 10 if id == 1 else 110
 
     def executeTurn(self):
         global dices 
@@ -138,7 +151,7 @@ class Player:
             running = False
 
     def renderText(self):
-        width = 0
+        height = 0
         texts = [
             "Player " + str(self.id),
             "Money: " + str(self.money),
@@ -146,8 +159,8 @@ class Player:
         ]
         for string in texts:
             text = font.render(string, True, (255, 255, 255))
-            window.blit(text, (self.textX, width))
-            width += 20
+            window.blit(text, (0, height + self.textY))
+            height += 20
 
     def renderPosition(self):
         renderDelay = 100
@@ -324,6 +337,7 @@ while running:
     # Clear the screen
     window.fill((0, 0, 0))  # Fill with black
 
+    #render squares
     for square in board:
         pygame.draw.rect(window, square['bigColor'], (square['position'], square['size']))
         if 'colorRect' in square:
@@ -344,8 +358,15 @@ while running:
         player.renderText()
         player.renderPosition()
 
-    text = font.render("Dice: " + str(dices[0] + dices[1]), True, (255, 255, 255))
-    window.blit(text, (WIDTH // 2, HEIGHT // 2))
+    
+    dice1 = DICE_FACES[dices[0] - 1]
+    dice2 = DICE_FACES[dices[1] - 1]
+
+    window.blit(dice1, (WIDTH // 2, HEIGHT // 2))
+    window.blit(dice2, (WIDTH // 2 + 50, HEIGHT // 2))
+
+    # text = font.render("DiceS: " + str(dices[0]) + " " + str(dices[1]), True, (255, 255, 255))
+    # window.blit(text, (WIDTH // 2, HEIGHT // 2))
     
     # Update the display
     pygame.display.flip()
