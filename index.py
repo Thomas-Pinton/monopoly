@@ -94,6 +94,8 @@ class Player:
 
         if board[self.position]['type'] == 'property':
             self.checkProperty()
+        elif board[self.position]['type'] == 'railroad':
+            self.checkRailroad()
         elif board[self.position]['type'] == 'chance':
             global chance
             chance.getCard(self)
@@ -127,6 +129,27 @@ class Player:
 
         elif property['owner'] == self.id:
             self.buyHouse()
+
+    def checkRailroad(self):
+        railroad = board[self.position]
+        
+        if railroad['owner'] == 0:
+            self.buyProperty()
+            
+        elif railroad['owner'] != self.id:
+            railroadsOwned = 0
+            # Couting the amount of railroads that player own
+            for i in range(4):
+                if board[i + 5]['owner'] == railroad['owner']:
+                    railroadsOwned += 1
+                i += 9
+            rent = 25 * railroadsOwned
+            self.money -= rent
+            players[property['owner']-1].money += rent
+            if self.money < 0:
+                global running
+                print("Player " + str(self.id) + " lost")
+                running = False
 
     def buyProperty(self):
         property = board[self.position]
@@ -299,8 +322,10 @@ for i in range(len(board)):
         else:
             board[i]['colorRect']['size'] = (20, SQUARE_SMALL)
         board[i]['colorRect']['color'] = board[i]['color']
-    if board[i]['type'] == 'chance':
+    elif board[i]['type'] == 'chance':
         board[i]['bigColor'] = (255, 255, 255)
+    elif board[i]['type'] == 'railroad':
+        board[i]['owner'] = 0
 
     position[addAxis] -= valueToAdd
         
@@ -358,7 +383,7 @@ while running:
         player.renderText()
         player.renderPosition()
 
-    
+    # Render dices
     dice1 = DICE_FACES[dices[0] - 1]
     dice2 = DICE_FACES[dices[1] - 1]
 
